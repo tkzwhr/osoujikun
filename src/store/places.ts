@@ -32,7 +32,24 @@ function _findPlan(places: Place[], id: string): Plan | undefined {
   name: 'places'
 })
 export default class PlacesModule extends VuexModule {
-  places: Place[] = []
+  places: Place[] = [
+    {
+      id: 'aaa',
+      name: 'お風呂',
+      tasks: [{
+        id: 'bbb',
+        name: '通常',
+        plans: [{
+          id: 'ccc',
+          name: '',
+          default: true,
+          interval: 7,
+          latest: new Date(),
+          memo: ''
+        }]
+      }]
+    }
+  ]
 
   get findPlace(): (placeId: string) => Place | undefined {
     return (placeId: string) => _findPlace(this.places, placeId)
