@@ -1,99 +1,115 @@
 <template>
   <div>
-    <b-navbar :mobile-burger="false">
+    <b-navbar class="nav"
+              fixed-top
+    >
       <template slot="brand">
-        <b-navbar-item tag="router-link" :to="{ path: '/' }">
-          <span>お掃除くん</span>
-        </b-navbar-item>
         <b-navbar-item tag="div">
-          <div class="buttons">
-            <b-button icon-pack="fas" icon-right="clock" />
-            <b-button icon-pack="fas" icon-right="plus" @click="createPlace" />
-          </div>
+          <span class="has-text-weight-bold has-text-white">お掃除くん</span>
+        </b-navbar-item>
+      </template>
+      <template slot="end">
+        <b-navbar-item tag="div" class="is-primary buttons">
+          <b-button class="is-primary"
+                    icon-pack="fas"
+                    icon-left="clock"
+          />
+          <b-button class="is-primary"
+                    icon-pack="fas"
+                    icon-left="plus"
+                    @click="createPlace"
+          />
         </b-navbar-item>
       </template>
     </b-navbar>
-    <template>
-      <b-collapse
-          v-for="place in placesStore.places"
-          :key="place.id"
-          :open="false"
-          class="card"
-          :aria-id="place.id">
-        <div
-            slot="trigger"
-            slot-scope="props"
-            class="card-header"
-            role="button"
-            :aria-controls="place.id">
-          <p class="card-header-title">
-            {{place.name}}
-          </p>
-          <a class="card-header-icon">
-            <b-icon
-                pack="fas"
-                :icon="props.open ? 'angle-down' : 'angle-right'">
-            </b-icon>
-          </a>
-        </div>
-        <div class="card-content tasks">
-          <b-table
-              :data="place.tasks"
-              ref="table"
-              detailed
-              custom-detail-row
-              show-detail-icon
-              striped
-              icon-pack="fas"
-              :mobile-cards="false">
-            <template slot-scope="props">
-              <b-table-column>{{ props.row.name }}</b-table-column>
-              <b-table-column class="has-text-right">
-                <span :class="
-                  [
-                    'tag',
-                    hasExpired(props.row) ? 'is-warning' : 'is-success'
-                  ]"
-                >
-                  {{ latestPlan(props.row).latest | fromNow }}
-                </span>
-              </b-table-column>
-            </template>
-            <template slot="detail" slot-scope="props">
-              <tr v-for="plan in props.row.plans" :key="`${props.row.name}.${plan.name}`">
-                <td></td>
-                <td class="plan-name">{{ plan.default ? `(${props.row.name})` : plan.name }}</td>
-                <td class="has-text-right">
-                  <span :class="
-                    [
-                      'tag',
-                      isExpired(plan) ? 'is-warning' : 'is-success'
-                    ]"
-                  >
-                    {{ plan.latest | fromNow }}
-                  </span>
-                </td>
-              </tr>
-            </template>
-          </b-table>
-        </div>
-        <footer class="card-footer">
-          <div class="card-footer-item buttons">
-            <b-button class="is-small"
+    <div v-if="placesStore.places.length === 0" style="padding: .5rem">
+      <b-message type="is-warning"
+                 icon-pack="fas"
+                 has-icon
+                 icon-size="is-small"
+      >
+        <p style="margin-bottom: 1rem">場所が追加されていません</p>
+        <b-button class="is-primary is-small"
+                  icon-pack="fas"
+                  icon-left="plus"
+                  @click="createPlace"
+        >
+          場所を追加する
+        </b-button>
+      </b-message>
+    </div>
+    <b-collapse
+        v-else
+        v-for="place in placesStore.places"
+        :key="place.id"
+        :open="false"
+        class="card"
+        :aria-id="place.id">
+      <div
+          slot="trigger"
+          slot-scope="props"
+          class="card-header"
+          role="button"
+          :aria-controls="place.id">
+        <p class="card-header-title">
+          {{place.name}}
+        </p>
+        <a class="card-header-icon">
+          <b-icon
+              pack="fas"
+              :icon="props.open ? 'angle-down' : 'angle-right'">
+          </b-icon>
+        </a>
+      </div>
+      <div v-if="place.tasks.length === 0" class="card-content" style="padding: .5rem">
+        <b-message type="is-warning"
+                   icon-pack="fas"
+                   has-icon
+                   icon-size="is-small"
+        >
+          <p style="margin-bottom: 1rem">タスクが追加されていません</p>
+          <b-button class="is-primary is-small"
+                    icon-pack="fas"
+                    icon-left="plus"
+                    @click="createTask(place.id)"
+          >
+            タスクを追加する
+          </b-button>
+        </b-message>
+      </div>
+      <div v-else class="card-content tasks">
+        <plans-table :place="place"
+                     @on-edit-task="editTask"
+                     @on-add-plan="createPlan"
+                     @on-edit-plan="editPlan"
+                     @on-do-cleaning="doCleaning"
+        />
+      </div>
+      <footer class="card-footer">
+        <div class="card-footer-item">
+          <b-button type="is-small is-danger"
+                    icon-pack="fas"
+                    icon-left="trash"
+                    @click="deletePlace(place.id)">
+            削除する
+          </b-button>
+          <div class="buttons">
+            <b-button type="is-small"
                       icon-pack="fas"
-                      icon-left="plus">
-              タスクを追加
+                      icon-left="edit"
+                      @click="editPlace(place.id)">
+              場所の名前を変更する
             </b-button>
-            <b-button type="is-small is-danger"
+            <b-button class="is-small is-primary"
                       icon-pack="fas"
-                      icon-left="trash"
-                      @click="deletePlace(place.id)">
-              削除する
+                      icon-left="plus"
+                      @click="createTask(place.id)">
+              タスクを追加する
             </b-button>
           </div>
-        </footer>
-      </b-collapse>
-    </template>
+        </div>
+      </footer>
+    </b-collapse>
   </div>
 </template>
 
@@ -103,25 +119,27 @@
   import dayjs from 'dayjs'
   import relativeTime from 'dayjs/plugin/relativeTime'
   import PlacesModule from '@/store/places'
-  import {Plan, Task} from '@/interface'
+  import PlansTable from '@/components/PlansTable.vue'
+  import EditTask from '@/components/EditTask.vue'
+  import EditPlan from '@/components/EditPlan.vue'
 
   dayjs.extend(relativeTime)
 
   @Component({
     name: 'list',
-    filters: {
-      fromNow: (value: Date) => dayjs(value).fromNow(),
-    }
+    components: {
+      PlansTable,
+      EditTask,
+      EditPlan
+    },
   })
-  export default class HelloWorld extends Vue {
+  export default class List extends Vue {
     placesStore = getModule(PlacesModule)
 
     createPlace() {
       this.$buefy.dialog.prompt({
-        message: `場所の名前を入力してください`,
-        inputAttrs: {
-
-        },
+        title: '場所を作成',
+        message: '場所の名前を入力してください',
         trapFocus: true,
         onConfirm: (value) => {
           this.placesStore.createPlace({name: value})
@@ -129,10 +147,100 @@
       })
     }
 
+    createTask(placeId: string) {
+      const place = this.placesStore.findPlace(placeId)!
+      this.$buefy.modal.open({
+        parent: this,
+        component: EditTask,
+        hasModalCard: true,
+        props: {
+          placeId,
+          placeName: place.name
+        },
+        events: {
+          'on-create': this.placesStore.createTask
+        }
+      })
+    }
+
+    createPlan(taskId: string) {
+      const task = this.placesStore.findTask(taskId)!
+      const place = this.placesStore.findPlaceByTask(taskId)!
+      this.$buefy.modal.open({
+        parent: this,
+        component: EditPlan,
+        hasModalCard: true,
+        props: {
+          taskId,
+          placeName: place.name,
+          taskName: task.name
+        },
+        events: {
+          'on-create': this.placesStore.createPlan
+        }
+      })
+    }
+
+    editPlace(placeId: string) {
+      this.$buefy.dialog.prompt({
+        title: '場所の名前を変更',
+        message: '場所の名前を入力してください',
+        trapFocus: true,
+        onConfirm: (value) => {
+          this.placesStore.updatePlace({targetId: placeId, name: value})
+        }
+      })
+    }
+
+    editTask(taskId: string) {
+      const task = this.placesStore.findTask(taskId)!
+      const place = this.placesStore.findPlaceByTask(taskId)!
+      const defaultPlan = task.plans.find(v => v.default)!
+      this.$buefy.modal.open({
+        parent: this,
+        component: EditTask,
+        hasModalCard: true,
+        props: {
+          taskId,
+          placeName: place.name,
+          taskName: task.name,
+          interval: defaultPlan.interval,
+          memo: defaultPlan.memo,
+        },
+        events: {
+          'on-update': this.placesStore.updateTask,
+          'on-delete': this.placesStore.deleteTask
+        }
+      })
+    }
+
+    editPlan(planId: string) {
+      const plan = this.placesStore.findPlan(planId)!
+      const task = this.placesStore.findTaskByPlan(planId)!
+      const place = this.placesStore.findPlaceByTask(task.id)!
+      this.$buefy.modal.open({
+        parent: this,
+        component: EditPlan,
+        hasModalCard: true,
+        props: {
+          planId,
+          placeName: place.name,
+          taskName: task.name,
+          planName: plan.name,
+          interval: plan.interval,
+          memo: plan.memo,
+        },
+        events: {
+          'on-update': this.placesStore.updatePlan,
+          'on-delete': this.placesStore.deletePlan
+        }
+      })
+    }
+
     deletePlace(value: string) {
       this.$buefy.dialog.confirm({
         title: '場所を削除します',
-        message: 'タスクとプランも削除されます。この操作は取り消せません。よろしいですか。',
+        message: 'タスクとプランも削除されます。この操作は取り消せません。削除してもよろしいですか。',
         confirmText: '削除する',
         type: 'is-danger',
         hasIcon: true,
@@ -141,36 +249,23 @@
       })
     }
 
-    latestPlan(task: Task): Plan | undefined {
-      return Array.from(task.plans).sort(plan => plan.latest.getTime()).pop()
-    }
-
-    hasExpired(task: Task): boolean {
-      const expiredPlan = task.plans
-          .find(plan => dayjs().diff(dayjs(plan.latest), 'day') >= plan.interval)
-      return expiredPlan !== undefined
-    }
-
-    isExpired(plan: Plan): boolean {
-      return dayjs().diff(dayjs(plan.latest), 'day') >= plan.interval
+    doCleaning(planId: string) {
+      this.placesStore.doCleaning(planId)
     }
   }
 </script>
 
-<style scoped type="scss">
+<style scoped lang="scss">
+  .nav {
+    background-color: #00d1b2;
+  }
   .tasks {
     padding: 0;
   }
-  .plan-name {
-    padding-left: 1.5rem;
-  }
-  .small {
-    font-size: 80%;
-  }
 </style>
 
-<style type="scss">
-  .tasks thead {
-    display: none;
+<style lang="scss">
+  .card-footer-item {
+    justify-content: space-between !important;
   }
 </style>

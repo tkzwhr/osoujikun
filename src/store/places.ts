@@ -32,31 +32,25 @@ function _findPlan(places: Place[], id: string): Plan | undefined {
   name: 'places'
 })
 export default class PlacesModule extends VuexModule {
-  places: Place[] = [
-    {
-      id: 'aaa',
-      name: 'お風呂',
-      tasks: [{
-        id: 'bbb',
-        name: '通常',
-        plans: [{
-          id: 'ccc',
-          name: '',
-          default: true,
-          interval: 7,
-          latest: new Date(),
-          memo: ''
-        }]
-      }]
-    }
-  ]
+  places: Place[] = []
 
   get findPlace(): (placeId: string) => Place | undefined {
     return (placeId: string) => _findPlace(this.places, placeId)
   }
 
+  get findPlaceByTask(): (taskId: string) => Place | undefined {
+    return (taskId: string) => this.places
+        .find(v => v.tasks.find(vv => vv.id === taskId) !== undefined)
+  }
+
   get findTask(): (taskId: string) => Task | undefined {
     return (taskId: string) => _findTask(this.places, taskId)
+  }
+
+  get findTaskByPlan(): (planId: string) => Task | undefined {
+    return (planId: string) => this.places
+        .flatMap(v => v.tasks)
+        .find(v => v.plans.find(vv => vv.id === planId) !== undefined)
   }
 
   get findPlan(): (planId: string) => Plan | undefined {
@@ -84,7 +78,7 @@ export default class PlacesModule extends VuexModule {
           name: '',
           default: true,
           interval: payload.interval,
-          latest: new Date(),
+          latest: undefined,
           memo: payload.memo
         }]
       })
@@ -100,7 +94,7 @@ export default class PlacesModule extends VuexModule {
         name: payload.name,
         default: false,
         interval: payload.interval,
-        latest: new Date(),
+        latest: undefined,
         memo: payload.memo
       })
     }

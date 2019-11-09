@@ -6,7 +6,7 @@ import store from './store'
 
 // --- ui ---
 import Buefy from 'buefy'
-import 'buefy/dist/buefy.css'
+import './main.scss'
 
 // --- datetime util ---
 import dayjs from 'dayjs'

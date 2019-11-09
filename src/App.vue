@@ -2,7 +2,7 @@
   <router-view/>
 </template>
 
-<style type="scss">
+<style lang="scss">
   body {
     font-family: 'Noto Sans Japanese', sans-serif;
     margin: 0;

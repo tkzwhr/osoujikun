@@ -1,0 +1,144 @@
+<template>
+  <form @submit.prevent="isCreateMode ? onCreate() : onUpdate()">
+    <div class="modal-card" style="width: auto">
+      <header class="modal-card-head">
+        <p class="modal-card-title">
+          {{isCreateMode ? 'プランを追加' : 'プランを編集'}}
+        </p>
+      </header>
+      <section class="modal-card-body">
+        <b-field label="場所">
+          <b-input
+              type="text"
+              :value="placeName"
+              disabled>
+          </b-input>
+        </b-field>
+        <b-field label="タスク">
+          <b-input
+              type="text"
+              :value="taskName"
+              disabled>
+          </b-input>
+        </b-field>
+        <b-field label="プラン">
+          <b-input
+              type="text"
+              v-model="inputPlanName"
+              placeholder="プラン名を入力してください"
+              required>
+          </b-input>
+        </b-field>
+        <b-field label="リマインド">
+          <b-select placeholder="Select a character" v-model="selectedInterval" required>
+            <option value="7">1週間ごと</option>
+            <option value="14">2週間ごと</option>
+            <option value="28">1ヶ月ごと</option>
+            <option value="42">1.5ヶ月ごと</option>
+            <option value="56">2ヶ月ごと</option>
+            <option value="91">3ヶ月ごと</option>
+            <option value="182">半年ごと</option>
+            <option value="364">1年ごと</option>
+            <option value="0">リマインドしない</option>
+          </b-select>
+        </b-field>
+        <b-field label="メモ">
+          <b-input
+              type="textarea"
+              v-model="inputMemo"
+              placeholder="メモを入力できます">
+          </b-input>
+        </b-field>
+      </section>
+      <footer :class="isCreateMode ? 'modal-card-foot right' : 'modal-card-foot between'">
+        <button v-if="!isCreateMode" class="button is-danger" type="button" @click="confirmDelete">削除する</button>
+        <div>
+          <button class="button" type="button" @click="$parent.close()">キャンセル</button>
+          <button class="button is-primary">{{isCreateMode ? '作成する' : '更新する'}}</button>
+        </div>
+      </footer>
+    </div>
+  </form>
+</template>
+
+<script lang="ts">
+  import {Component, Emit, Prop, Vue} from 'vue-property-decorator'
+  import {CreatePlanParams, UpdatePlanParams} from '@/interface'
+
+  @Component({
+    name: 'edit-plan'
+  })
+  export default class EditPlan extends Vue {
+    $parent: any;
+
+    @Prop() readonly placeName!: string
+    @Prop() readonly taskId?: string
+    @Prop() readonly taskName!: string
+    @Prop() readonly planId?: string
+    @Prop() readonly planName?: string
+    @Prop() readonly interval?: number
+    @Prop() readonly memo?: string | undefined
+
+    inputPlanName: string = this.planName || ''
+    // noinspection TypeScriptValidateTypes
+    selectedInterval: string = this.interval === undefined ? '7' : `${this.interval}`
+    inputMemo: string = this.memo || ''
+
+    @Emit()
+    onCreate(): CreatePlanParams {
+      const params = {
+        taskId: this.taskId!,
+        name: this.inputPlanName,
+        interval: parseInt(this.selectedInterval),
+        memo: this.inputMemo.length > 0 ? this.inputMemo : undefined
+      }
+      this.$parent.close()
+      return params
+    }
+
+    @Emit()
+    onUpdate(): UpdatePlanParams {
+      const params = {
+        targetId: this.planId!,
+        name: this.inputPlanName,
+        interval: parseInt(this.selectedInterval),
+        memo: this.inputMemo.length > 0 ? this.inputMemo : undefined
+      }
+      this.$parent.close()
+      return params
+    }
+
+    @Emit()
+    onDelete(): string {
+      return this.planId!
+    }
+
+    confirmDelete() {
+      this.$buefy.dialog.confirm({
+        title: 'プランを削除します',
+        message: 'この操作は取り消せません。削除してもよろしいですか。',
+        confirmText: '削除する',
+        type: 'is-danger',
+        hasIcon: true,
+        iconPack: 'fas',
+        onConfirm: () => {
+          this.onDelete()
+          this.$parent.close()
+        }
+      })
+    }
+
+    get isCreateMode(): boolean {
+      return this.planId === undefined
+    }
+  }
+</script>
+
+<style lang="scss">
+  .modal-card-foot.right {
+    justify-content: flex-end !important;
+  }
+  .modal-card-foot.between {
+    justify-content: space-between !important;
+  }
+</style>
