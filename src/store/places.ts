@@ -26,8 +26,6 @@ function _findPlan(places: Place[], id: string): Plan | undefined {
 }
 
 @Module({
-  dynamic: true,
-  store,
   namespaced: true,
   name: 'places'
 })

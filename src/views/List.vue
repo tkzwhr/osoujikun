@@ -134,7 +134,7 @@
     },
   })
   export default class List extends Vue {
-    placesStore = getModule(PlacesModule)
+    placesStore = getModule(PlacesModule, this.$store)
 
     createPlace() {
       this.$buefy.dialog.prompt({
