@@ -43,7 +43,7 @@
         v-for="place in placesStore.places"
         :key="place.id"
         :open="false"
-        class="card"
+        class="card place"
         :aria-id="place.id">
       <div
           slot="trigger"
@@ -51,15 +51,15 @@
           class="card-header"
           role="button"
           :aria-controls="place.id">
-        <p class="card-header-title">
-          {{place.name}}
-        </p>
         <a class="card-header-icon">
           <b-icon
               pack="fas"
               :icon="props.open ? 'angle-down' : 'angle-right'">
           </b-icon>
         </a>
+        <p class="card-header-title">
+          {{place.name}}
+        </p>
       </div>
       <div v-if="place.tasks.length === 0" class="card-content" style="padding: .5rem">
         <b-message type="is-warning"
@@ -91,20 +91,20 @@
                     icon-pack="fas"
                     icon-left="trash"
                     @click="deletePlace(place.id)">
-            削除する
+            削除
           </b-button>
           <div class="buttons">
             <b-button type="is-small"
                       icon-pack="fas"
                       icon-left="edit"
                       @click="editPlace(place.id)">
-              場所の名前を変更する
+              名前変更
             </b-button>
             <b-button class="is-small is-primary"
                       icon-pack="fas"
                       icon-left="plus"
                       @click="createTask(place.id)">
-              タスクを追加する
+              タスク
             </b-button>
           </div>
         </div>
@@ -182,9 +182,13 @@
     }
 
     editPlace(placeId: string) {
+      const place = this.placesStore.findPlace(placeId)!
       this.$buefy.dialog.prompt({
         title: '場所の名前を変更',
         message: '場所の名前を入力してください',
+        inputAttrs: {
+          value: place.name
+        },
         trapFocus: true,
         onConfirm: (value) => {
           this.placesStore.updatePlace({targetId: placeId, name: value})
@@ -258,6 +262,9 @@
 <style scoped lang="scss">
   .nav {
     background-color: #00d1b2;
+  }
+  .place {
+    margin: 1rem .5rem;
   }
   .tasks {
     padding: 0;

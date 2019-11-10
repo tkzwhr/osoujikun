@@ -144,7 +144,7 @@
     latestPlan(task: Task): Plan | undefined {
       return Array.from(task.plans)
           .filter(plan => plan.interval > 0 && plan.latest)
-          .sort(plan => plan.latest!.getTime())
+          .sort(plan => new Date(plan.latest!).getTime())
           .pop()
     }
 
@@ -162,7 +162,7 @@
 
 <style scoped lang="scss">
   .plan-name {
-    padding-left: 1.5rem;
+    padding-left: 2rem;
   }
 </style>
 
