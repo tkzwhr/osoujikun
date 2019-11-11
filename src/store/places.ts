@@ -1,6 +1,5 @@
 import nanoid from 'nanoid'
 import {Module, VuexModule, Mutation, Action} from 'vuex-module-decorators'
-import store from '@/store'
 import {
   Task,
   Place,
@@ -76,7 +75,7 @@ export default class PlacesModule extends VuexModule {
           name: '',
           default: true,
           interval: payload.interval,
-          latest: undefined,
+          latest: null,
           memo: payload.memo
         }]
       })
@@ -92,7 +91,7 @@ export default class PlacesModule extends VuexModule {
         name: payload.name,
         default: false,
         interval: payload.interval,
-        latest: undefined,
+        latest: null,
         memo: payload.memo
       })
     }

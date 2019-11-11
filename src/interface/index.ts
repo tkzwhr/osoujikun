@@ -15,7 +15,7 @@ export interface Plan {
   name: string,
   default: boolean,
   interval: number,
-  latest: Date | undefined,
+  latest: Date | null,
   memo: string | undefined,
 }
 

@@ -149,7 +149,7 @@
     latestPlan(task: Task): Plan | undefined {
       return Array.from(task.plans)
           .filter(plan => plan.interval > 0 && plan.latest)
-          .sort(plan => new Date(plan.latest!).getTime())
+          .sort(plan => dayjs(plan.latest!).toDate().getTime())
           .pop()
     }
 
@@ -159,7 +159,7 @@
         return 'is-dark'
       }
 
-      const isExpired = dayjs().diff(dayjs(plan.latest), 'day') >= plan.interval
+      const isExpired = dayjs().diff(dayjs(plan.latest!), 'day') >= plan.interval
       return isExpired ? 'is-warning' : 'is-success'
     }
   }
