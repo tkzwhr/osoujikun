@@ -51,10 +51,10 @@
         </b-field>
       </section>
       <footer :class="isCreateMode ? 'modal-card-foot right' : 'modal-card-foot between'">
-        <button v-if="!isCreateMode" class="button is-danger" type="button" @click="confirmDelete">削除する</button>
+        <button v-if="!isCreateMode" class="button is-small is-danger" type="button" @click="confirmDelete">削除する</button>
         <div>
-          <button class="button" type="button" @click="$parent.close()">キャンセル</button>
-          <button class="button is-primary">{{isCreateMode ? '作成する' : '更新する'}}</button>
+          <button class="button is-small" type="button" @click="$parent.close()">キャンセル</button>
+          <button class="button is-small is-primary">{{isCreateMode ? '作成する' : '更新する'}}</button>
         </div>
       </footer>
     </div>
@@ -117,6 +117,7 @@
       this.$buefy.dialog.confirm({
         title: 'プランを削除します',
         message: 'この操作は取り消せません。削除してもよろしいですか。',
+        cancelText: 'キャンセル',
         confirmText: '削除する',
         type: 'is-danger',
         hasIcon: true,

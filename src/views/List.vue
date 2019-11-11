@@ -140,6 +140,8 @@
       this.$buefy.dialog.prompt({
         title: '場所を作成',
         message: '場所の名前を入力してください',
+        cancelText: 'キャンセル',
+        confirmText: '作成する',
         trapFocus: true,
         onConfirm: (value) => {
           this.placesStore.createPlace({name: value})
@@ -184,8 +186,10 @@
     editPlace(placeId: string) {
       const place = this.placesStore.findPlace(placeId)!
       this.$buefy.dialog.prompt({
-        title: '場所の名前を変更',
+        title: '場所の名前を編集',
         message: '場所の名前を入力してください',
+        cancelText: 'キャンセル',
+        confirmText: '更新する',
         inputAttrs: {
           value: place.name
         },
@@ -245,6 +249,7 @@
       this.$buefy.dialog.confirm({
         title: '場所を削除します',
         message: 'タスクとプランも削除されます。この操作は取り消せません。削除してもよろしいですか。',
+        cancelText: 'キャンセル',
         confirmText: '削除する',
         type: 'is-danger',
         hasIcon: true,
