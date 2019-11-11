@@ -11,7 +11,12 @@
       :row-class="function(row) { return isSimpleTask(row) ? 'hide-arrow-icon-detail': ''; }">
     <template slot-scope="props">
       <b-table-column>
-        <span>{{ props.row.name }}</span>
+        <span v-if="isSimpleTask(props.row)">
+          {{ props.row.name }}
+        </span>
+        <a v-else @click="$refs.table.toggleDetails(props.row)">
+          {{ props.row.name }}
+        </a>
         <b-button style="margin-left: 1rem"
                   class="is-small"
                   icon-pack="fas"
