@@ -26,6 +26,7 @@
               type="text"
               v-model="inputPlanName"
               placeholder="プラン名を入力してください"
+              pattern=".*\S+.*"
               required>
           </b-input>
         </b-field>

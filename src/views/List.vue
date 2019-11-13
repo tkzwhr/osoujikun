@@ -143,6 +143,9 @@
         cancelText: 'キャンセル',
         confirmText: '作成する',
         trapFocus: true,
+        inputAttrs: {
+          pattern: ".*\\S+.*"
+        },
         onConfirm: (value) => {
           this.placesStore.createPlace({name: value})
         }

@@ -19,6 +19,7 @@
               type="text"
               v-model="inputTaskName"
               placeholder="タスク名を入力してください"
+              pattern=".*\S+.*"
               required>
           </b-input>
         </b-field>
