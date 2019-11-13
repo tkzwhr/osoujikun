@@ -11,12 +11,14 @@
       :row-class="function(row) { return isSimpleTask(row) ? 'hide-arrow-icon-detail': ''; }">
     <template slot-scope="props">
       <b-table-column>
-        <span v-if="isSimpleTask(props.row)">
-          {{ props.row.name }}
-        </span>
-        <a v-else @click="$refs.table.toggleDetails(props.row)">
-          {{ props.row.name }}
-        </a>
+        <b-tooltip v-if="props.row.plans[0].memo && props.row.plans[0].memo.length > 0"
+                   :label="props.row.plans[0].memo"
+                   type="is-info"
+                   multilined
+        >
+          <a @click="false">{{ props.row.name }}</a>
+        </b-tooltip>
+        <span v-else>{{ props.row.name }}</span>
         <b-button style="margin-left: 1rem"
                   class="is-small"
                   icon-pack="fas"
@@ -62,7 +64,14 @@
       <tr v-for="plan in props.row.plans" :key="`${props.row.name}.${plan.name}`">
         <td></td>
         <td class="plan-name">
-          <span>{{ plan.default ? `(${props.row.name})` : plan.name }}</span>
+          <b-tooltip v-if="plan.memo && plan.memo.length > 0"
+                     :label="plan.memo"
+                     type="is-info"
+                     multilined
+          >
+            <a @click="false">{{ plan.default ? `(${props.row.name})` : plan.name }}</a>
+          </b-tooltip>
+          <span v-else>{{ plan.default ? `(${props.row.name})` : plan.name }}</span>
           <b-button v-if="plan.default"
                     style="margin-left: 1rem"
                     class="is-small"

@@ -91,7 +91,7 @@
         taskId: this.taskId!,
         name: this.inputPlanName,
         interval: parseInt(this.selectedInterval),
-        memo: this.inputMemo.length > 0 ? this.inputMemo : undefined
+        memo: this.inputMemo.length > 0 ? this.inputMemo : null
       }
       this.$parent.close()
       return params
@@ -103,7 +103,7 @@
         targetId: this.planId!,
         name: this.inputPlanName,
         interval: parseInt(this.selectedInterval),
-        memo: this.inputMemo.length > 0 ? this.inputMemo : undefined
+        memo: this.inputMemo.length > 0 ? this.inputMemo : null
       }
       this.$parent.close()
       return params

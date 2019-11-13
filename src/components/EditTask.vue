@@ -83,7 +83,7 @@
         placeId: this.placeId!,
         name: this.inputTaskName,
         interval: parseInt(this.selectedInterval),
-        memo: this.inputMemo.length > 0 ? this.inputMemo : undefined
+        memo: this.inputMemo.length > 0 ? this.inputMemo : null
       }
       this.$parent.close()
       return params
@@ -95,7 +95,7 @@
         targetId: this.taskId!,
         name: this.inputTaskName,
         interval: parseInt(this.selectedInterval),
-        memo: this.inputMemo.length > 0 ? this.inputMemo : undefined
+        memo: this.inputMemo.length > 0 ? this.inputMemo : null
       }
       this.$parent.close()
       return params

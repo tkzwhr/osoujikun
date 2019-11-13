@@ -16,7 +16,7 @@ export interface Plan {
   default: boolean,
   interval: number,
   latest: Date | null,
-  memo: string | undefined,
+  memo: string | null,
 }
 
 export interface CreatePlaceParams {
@@ -27,14 +27,14 @@ export interface CreateTaskParams {
   placeId: string,
   name: string,
   interval: number,
-  memo: string | undefined,
+  memo: string | null,
 }
 
 export interface CreatePlanParams {
   taskId: string,
   name: string,
   interval: number,
-  memo: string | undefined,
+  memo: string | null,
 }
 
 export interface UpdatePlaceParams {
@@ -46,12 +46,12 @@ export interface UpdateTaskParams {
   targetId: string,
   name: string,
   interval: number,
-  memo: string | undefined,
+  memo: string | null,
 }
 
 export interface UpdatePlanParams {
   targetId: string,
   name: string,
   interval: number,
-  memo: string | undefined,
+  memo: string | null,
 }
