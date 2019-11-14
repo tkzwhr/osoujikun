@@ -19,18 +19,20 @@
           <a @click="false">{{ props.row.name }}</a>
         </b-tooltip>
         <span v-else>{{ props.row.name }}</span>
-        <b-button style="margin-left: 1rem"
-                  class="is-small"
-                  icon-pack="fas"
-                  icon-right="edit"
-                  @click="onEditTask(props.row.id)"
-        />
-        <b-button style="margin-left: 1rem"
-                  class="is-small"
-                  icon-pack="fas"
-                  icon-right="plus"
-                  @click="onAddPlan(props.row.id)"
-        />
+        <b-dropdown aria-role="list">
+          <button class="button is-small task-submenu" slot="trigger">
+            <b-icon pack="fas" icon="caret-down"></b-icon>
+          </button>
+          <b-dropdown-item aria-role="listitem" @click="onEditTask(props.row.id)">
+            <b-icon pack="fas" icon="edit"></b-icon>
+            <span class="dropdown-subject">編集</span>
+          </b-dropdown-item>
+          <hr class="dropdown-divider" aria-role="menuitem">
+          <b-dropdown-item aria-role="listitem" @click="onAddPlan(props.row.id)">
+            <b-icon pack="fas" icon="plus"></b-icon>
+            <span class="dropdown-subject">プランを追加</span>
+          </b-dropdown-item>
+        </b-dropdown>
       </b-table-column>
       <b-table-column class="has-text-right">
         <b-button v-if="isSimpleTask(props.row) && props.row.plans[0].latest"
@@ -73,15 +75,13 @@
           </b-tooltip>
           <span v-else>{{ plan.default ? `(${props.row.name})` : plan.name }}</span>
           <b-button v-if="plan.default"
-                    style="margin-left: 1rem"
-                    class="is-small"
+                    class="is-small task-submenu"
                     icon-pack="fas"
                     icon-right="edit"
                     @click="onEditTask(props.row.id)"
           />
           <b-button v-else
-                    style="margin-left: 1rem"
-                    class="is-small"
+                    class="is-small task-submenu"
                     icon-pack="fas"
                     icon-right="edit"
                     @click="onEditPlan(plan.id)"
@@ -177,6 +177,12 @@
 <style scoped lang="scss">
   .plan-name {
     padding-left: 2rem;
+  }
+  .task-submenu {
+    margin-left: 1rem;
+  }
+  .dropdown-subject {
+    margin-left: .5rem;
   }
 </style>
 
