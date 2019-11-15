@@ -17,11 +17,14 @@ function _findPlace(places: Place[], id: string): Place | undefined {
 }
 
 function _findTask(places: Place[], id: string): Task | undefined {
-  return places.flatMap(v => v.tasks).find(v => v.id === id)
+  return places.flatMap(v => v.tasks)
+      .find(v => v.id === id)
 }
 
 function _findPlan(places: Place[], id: string): Plan | undefined {
-  return places.flatMap(v => v.tasks).flatMap(v => v.plans).find(v => v.id === id)
+  return places.flatMap(v => v.tasks)
+      .flatMap(v => v.plans)
+      .find(v => v.id === id)
 }
 
 @Module({
@@ -74,14 +77,14 @@ export default class PlacesModule extends VuexModule {
       place.tasks.push({
         id: nanoid(),
         name: payload.name,
-        plans: [{
+        plan: {
           id: nanoid(),
           name: '',
-          default: true,
           interval: payload.interval,
           latest: null,
           memo: payload.memo
-        }]
+        },
+        plans: []
       })
     }
   }
@@ -93,7 +96,6 @@ export default class PlacesModule extends VuexModule {
       task.plans.push({
         id: nanoid(),
         name: payload.name,
-        default: false,
         interval: payload.interval,
         latest: null,
         memo: payload.memo
@@ -114,11 +116,8 @@ export default class PlacesModule extends VuexModule {
     const task = _findTask(this.places, payload.targetId)
     if (task) {
       task.name = payload.name
-      const defaultPlan = task.plans.find(v => v.default)
-      if (defaultPlan) {
-        defaultPlan.interval = payload.interval
-        defaultPlan.memo = payload.memo
-      }
+      task.plan.interval = payload.interval
+      task.plan.memo = payload.memo
     }
   }
 
@@ -152,7 +151,10 @@ export default class PlacesModule extends VuexModule {
 
   @Mutation
   DO_CLEANING(payload: string) {
-    const plan = _findPlan(this.places, payload)
+    const plan = this.places
+        .flatMap(v => v.tasks)
+        .flatMap(v => v.plans.concat(v.plan))
+        .find(v => v.id === payload)
     if (plan) {
       plan.latest = new Date()
     }
@@ -185,10 +187,7 @@ export default class PlacesModule extends VuexModule {
 
   @Action
   async updatePlan(payload: UpdatePlanParams) {
-    const plan: Plan | undefined = this.context.getters['findPlan'](payload.targetId)
-    if (plan && !plan.default) {
-      this.context.commit('UPDATE_PLAN', payload)
-    }
+    this.context.commit('UPDATE_PLAN', payload)
   }
 
   @Action
@@ -203,10 +202,7 @@ export default class PlacesModule extends VuexModule {
 
   @Action
   async deletePlan(payload: string) {
-    const plan: Plan | undefined = this.context.getters['findPlan'](payload)
-    if (plan && !plan.default) {
-      this.context.commit('DELETE_PLAN', payload)
-    }
+    this.context.commit('DELETE_PLAN', payload)
   }
 
   @Action

@@ -24,7 +24,11 @@
           </b-input>
         </b-field>
         <b-field label="リマインド">
-          <b-select v-model="selectedInterval" required>
+          <b-select v-if="hasPlans" placeholder="プランが追加されているため無効化されています" />
+          <b-select v-else
+                    v-model="selectedInterval"
+                    required
+          >
             <option v-for="ri in remindIntervals" :key="ri.value" :value="ri.value">{{ri.label}}</option>
           </b-select>
         </b-field>
@@ -72,6 +76,7 @@
     @Prop() readonly placeName!: string
     @Prop() readonly taskId?: string
     @Prop() readonly taskName?: string
+    @Prop() readonly hasPlans!: boolean
     @Prop() readonly interval?: number
     @Prop() readonly memo?: string | undefined
 

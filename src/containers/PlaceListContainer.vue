@@ -13,7 +13,7 @@
     />
   </div>
   <div v-else>
-    <place-empty-card @on-add-place="createPlace"/>
+    <place-empty-card @on-add-place="addPlace"/>
   </div>
 </template>
 
@@ -38,7 +38,7 @@
   export default class PlaceListContainer extends Vue {
     placesStore = getModule(PlacesModule, this.$store)
 
-    createPlace() {
+    addPlace() {
       this.$buefy.dialog.prompt({
         title: '場所を作成',
         message: '場所の名前を入力してください',
@@ -108,7 +108,6 @@
     editTask(taskId: string) {
       const task = this.placesStore.findTask(taskId)!
       const place = this.placesStore.findPlaceByTask(taskId)!
-      const defaultPlan = task.plans.find(v => v.default)!
       this.$buefy.modal.open({
         parent: this,
         component: EditTaskDialog,
@@ -117,8 +116,9 @@
           taskId,
           placeName: place.name,
           taskName: task.name,
-          interval: defaultPlan.interval,
-          memo: defaultPlan.memo,
+          hasPlans: task.plans.length > 0,
+          interval: task.plan.interval,
+          memo: task.plan.memo,
         },
         events: {
           'on-update': this.placesStore.updateTask,

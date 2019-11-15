@@ -7,13 +7,13 @@ export interface Place {
 export interface Task {
   id: string,
   name: string,
+  plan: Plan,
   plans: Plan[],
 }
 
 export interface Plan {
   id: string,
   name: string,
-  default: boolean,
   interval: number,
   latest: Date | null,
   memo: string | null,
