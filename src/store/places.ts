@@ -31,6 +31,10 @@ function _findPlan(places: Place[], id: string): Plan | undefined {
 export default class PlacesModule extends VuexModule {
   places: Place[] = []
 
+  get hasPlace(): boolean {
+    return this.places.length > 0
+  }
+
   get findPlace(): (placeId: string) => Place | undefined {
     return (placeId: string) => _findPlace(this.places, placeId)
   }

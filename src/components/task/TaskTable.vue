@@ -27,6 +27,7 @@
             <b-icon pack="fas" icon="edit"></b-icon>
             <span class="dropdown-subject">編集</span>
           </b-dropdown-item>
+          <!--suppress HtmlUnknownAttribute -->
           <hr class="dropdown-divider" aria-role="menuitem">
           <b-dropdown-item aria-role="listitem" @click="onAddPlan(props.row.id)">
             <b-icon pack="fas" icon="plus"></b-icon>
@@ -35,31 +36,13 @@
         </b-dropdown>
       </b-table-column>
       <b-table-column class="has-text-right">
-        <b-button v-if="isSimpleTask(props.row) && props.row.plans[0].latest"
-                  :type="buttonTypeOfPlan(props.row.plans[0])"
-                  :outlined="buttonTypeOfPlan(props.row.plans[0]) === 'is-dark'"
-                  class="is-small"
-                  icon-pack="fas"
-                  icon-left="calendar-check"
-                  @click="onDoCleaning(props.row.plans[0].id)"
-        >
-          {{ props.row.plans[0].latest | fromNow }}
-        </b-button>
-        <b-button v-else-if="isSimpleTask(props.row)"
-                  type="is-info"
-                  class="is-small"
-                  icon-pack="fas"
-                  icon-left="calendar-check"
-                  @click="onDoCleaning(props.row.plans[0].id)"
-        >
-          データなし
-        </b-button>
-        <b-tag v-else-if="latestPlan(props.row)"
-               :class="buttonTypeOfPlan(latestPlan(props.row))"
-               rounded
-        >
-          {{ latestPlan(props.row).latest | fromNow }}
-        </b-tag>
+        <clean-button v-if="isSimpleTask(props.row)"
+                      :plan="props.row.plans[0]"
+                      @on-do-cleaning="onDoCleaning"
+        />
+        <clean-tag v-else-if="latestPlan(props.row)"
+               :plan="latestPlan(props.row)"
+        />
       </b-table-column>
     </template>
     <template v-if="!isSimpleTask(props.row)" slot="detail" slot-scope="props">
@@ -88,25 +71,9 @@
           />
         </td>
         <td class="has-text-right">
-          <b-button v-if="plan.latest"
-                    :type="buttonTypeOfPlan(plan)"
-                    :outlined="buttonTypeOfPlan(plan) === 'is-dark'"
-                    class="is-small"
-                    icon-pack="fas"
-                    icon-left="calendar-check"
-                    @click="onDoCleaning(plan.id)"
-          >
-            {{ plan.latest | fromNow }}
-          </b-button>
-          <b-button v-else
-                    type="is-info"
-                    class="is-small"
-                    icon-pack="fas"
-                    icon-left="calendar-check"
-                    @click="onDoCleaning(plan.id)"
-          >
-            データなし
-          </b-button>
+          <clean-button :plan="plan"
+                        @on-do-cleaning="onDoCleaning"
+          />
         </td>
       </tr>
     </template>
@@ -117,39 +84,24 @@
   import Vue from 'vue'
   import {Component, Emit, Prop} from 'vue-property-decorator'
   import dayjs from 'dayjs'
-  import relativeTime from 'dayjs/plugin/relativeTime'
   import {Place, Plan, Task} from '@/interface'
-
-  dayjs.extend(relativeTime)
+  import CleanButton from '@/components/misc/CleanButton.vue'
+  import CleanTag from '@/components/misc/CleanTag.vue'
 
   @Component({
-    name: 'plans-table',
-    filters: {
-      fromNow: (value: Date) => dayjs(value).fromNow(),
+    name: 'task-table',
+    components: {
+      CleanButton,
+      CleanTag,
     },
   })
-  export default class MultiplePlansTable extends Vue {
+  export default class TaskTable extends Vue {
     @Prop() readonly place!: Place
 
-    @Emit()
-    onEditTask(taskId: string): string {
-      return taskId
-    }
-
-    @Emit()
-    onAddPlan(taskId: string): string {
-      return taskId
-    }
-
-    @Emit()
-    onEditPlan(planId: string): string {
-      return planId
-    }
-
-    @Emit()
-    onDoCleaning(planId: string): string {
-      return planId
-    }
+    @Emit() onEditTask(taskId: string): string { return taskId }
+    @Emit() onAddPlan(taskId: string): string { return taskId }
+    @Emit() onEditPlan(planId: string): string { return planId }
+    @Emit() onDoCleaning(planId: string): string { return planId }
 
     isSimpleTask(task: Task): boolean {
       return task.plans.find(v => !v.default) === undefined
@@ -160,16 +112,6 @@
           .filter(plan => plan.interval > 0 && plan.latest)
           .sort(plan => dayjs(plan.latest!).toDate().getTime())
           .pop()
-    }
-
-    buttonTypeOfPlan(plan: Plan): string {
-      const isSilent = plan.interval === 0
-      if (isSilent) {
-        return 'is-dark'
-      }
-
-      const isExpired = dayjs().diff(dayjs(plan.latest!), 'day') >= plan.interval
-      return isExpired ? 'is-warning' : 'is-success'
     }
   }
 </script>

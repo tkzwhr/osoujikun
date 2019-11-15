@@ -24,16 +24,8 @@
           </b-input>
         </b-field>
         <b-field label="リマインド">
-          <b-select placeholder="Select a character" v-model="selectedInterval" required>
-            <option value="7">1週間ごと</option>
-            <option value="14">2週間ごと</option>
-            <option value="28">1ヶ月ごと</option>
-            <option value="42">1.5ヶ月ごと</option>
-            <option value="56">2ヶ月ごと</option>
-            <option value="91">3ヶ月ごと</option>
-            <option value="182">半年ごと</option>
-            <option value="364">1年ごと</option>
-            <option value="0">リマインドしない</option>
+          <b-select v-model="selectedInterval" required>
+            <option v-for="ri in remindIntervals" :key="ri.value" :value="ri.value">{{ri.label}}</option>
           </b-select>
         </b-field>
         <b-field label="メモ">
@@ -45,7 +37,13 @@
         </b-field>
       </section>
       <footer :class="isCreateMode ? 'modal-card-foot right' : 'modal-card-foot between'">
-        <button v-if="!isCreateMode" class="button is-small is-danger" type="button" @click="confirmDelete">削除する</button>
+        <button v-if="!isCreateMode"
+                class="button is-small is-danger"
+                type="button"
+                @click="confirmDelete"
+        >
+          削除する
+        </button>
         <div>
           <button class="button is-small" type="button" @click="$parent.close()">キャンセル</button>
           <button class="button is-small is-primary">{{isCreateMode ? '作成する' : '更新する'}}</button>
@@ -58,12 +56,17 @@
 <script lang="ts">
   import {Component, Emit, Prop, Vue} from 'vue-property-decorator'
   import {CreateTaskParams, UpdateTaskParams} from '@/interface'
+  import * as RemindInterval from '@/enum/remindInterval'
 
   @Component({
-    name: 'edit-task'
+    name: 'edit-task-dialog'
   })
-  export default class EditTask extends Vue {
+  export default class EditTaskDialog extends Vue {
     $parent: any;
+    remindIntervals = RemindInterval.values.map(ri => ({
+      value: ri,
+      label: RemindInterval.label(ri)
+    }))
 
     @Prop() readonly placeId?: string
     @Prop() readonly placeName!: string
