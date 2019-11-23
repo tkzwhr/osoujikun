@@ -1,8 +1,10 @@
 <template>
-  <div v-if="placesStore.hasPlace">
-    <place-card v-for="place in placesStore.places"
+  <div v-if="hasPlaces">
+    <place-card v-for="place in places"
                 :place="place"
                 :key="place.id"
+                :opened="opens[place.id] !== undefined ? opens[place.id] : true"
+                @on-open="function(flag) { opens[place.id] = flag }"
                 @on-edit-place="editPlace"
                 @on-delete-place="deletePlace"
                 @on-add-task="addTask"
@@ -11,6 +13,9 @@
                 @on-edit-plan="editPlan"
                 @on-do-cleaning="doCleaning"
     />
+  </div>
+  <div v-else-if="placesStore.hasPlaces">
+    <recommend-place-empty-card />
   </div>
   <div v-else>
     <place-empty-card @on-add-place="addPlace"/>
@@ -21,22 +26,36 @@
   import {Component, Vue} from 'vue-property-decorator'
   import {getModule} from 'vuex-module-decorators'
   import PlacesModule from '@/store/places'
+  import UiModule from '@/store/ui'
   import PlaceCard from '@/components/place/PlaceCard.vue'
   import PlaceEmptyCard from '@/components/place/PlaceEmptyCard.vue'
+  import RecommendPlaceEmptyCard from '@/components/place/RecommendPlaceEmptyCard.vue'
   import EditTaskDialog from '@/components/task/EditTaskDialog.vue'
   import EditPlanDialog from '@/components/plan/EditPlanDialog.vue'
+  import {Place} from '@/interface'
 
   @Component({
     name: 'place-list-container',
     components: {
-      PlaceEmptyCard,
       PlaceCard,
+      PlaceEmptyCard,
+      RecommendPlaceEmptyCard,
       EditTaskDialog,
       EditPlanDialog,
     },
   })
   export default class PlaceListContainer extends Vue {
     placesStore = getModule(PlacesModule, this.$store)
+    uiStore = getModule(UiModule, this.$store)
+    opens = {}
+
+    get places(): Place[] {
+      return this.uiStore.showsOnlyRecommend ? this.placesStore.listRecommendPlaces : this.placesStore.places
+    }
+
+    get hasPlaces(): boolean {
+      return this.uiStore.showsOnlyRecommend ? this.placesStore.hasRecommendPlaces : this.placesStore.hasPlaces
+    }
 
     addPlace() {
       this.$buefy.dialog.prompt({

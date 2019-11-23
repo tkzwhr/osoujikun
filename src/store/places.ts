@@ -1,4 +1,5 @@
 import nanoid from 'nanoid'
+import dayjs from 'dayjs'
 import {Module, VuexModule, Mutation, Action} from 'vuex-module-decorators'
 import {
   Task,
@@ -34,8 +35,29 @@ function _findPlan(places: Place[], id: string): Plan | undefined {
 export default class PlacesModule extends VuexModule {
   places: Place[] = []
 
-  get hasPlace(): boolean {
+  get hasPlaces(): boolean {
     return this.places.length > 0
+  }
+
+  get hasRecommendPlaces(): boolean {
+    return this.listRecommendPlaces.length > 0
+  }
+
+  get listRecommendPlaces(): Place[] {
+    return this.places.flatMap(v => {
+      const tasks = v.tasks.flatMap(vv => {
+        if (vv.plans.length === 0) {
+          const isExpired = !vv.plan.latest || dayjs().diff(dayjs(vv.plan.latest), 'day') >= vv.plan.interval
+          return isExpired ? [vv] : []
+        } else {
+          const plans = vv.plans.filter(vvv =>
+            !vvv.latest || dayjs().diff(dayjs(vvv.latest), 'day') >= vvv.interval
+          )
+          return plans.length > 0 ? [{...vv,plans}] : []
+        }
+      })
+      return tasks.length > 0 ? [{...v,tasks}] : []
+    })
   }
 
   get findPlace(): (placeId: string) => Place | undefined {

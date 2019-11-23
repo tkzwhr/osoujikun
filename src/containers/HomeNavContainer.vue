@@ -1,11 +1,15 @@
 <template>
-  <home-nav @on-add-place="addPlace" />
+  <home-nav :showsOnlyRecommend="uiStore.showsOnlyRecommend"
+            @on-toggle-recommend="toggleRecommend"
+            @on-add-place="addPlace"
+  />
 </template>
 
 <script lang="ts">
   import {Component, Vue} from 'vue-property-decorator'
   import {getModule} from 'vuex-module-decorators'
   import PlacesModule from '@/store/places'
+  import UiModule from '@/store/ui'
   import HomeNav from '../components/nav/HomeNav.vue'
 
   @Component({
@@ -16,6 +20,11 @@
   })
   export default class HomeNavContainer extends Vue {
     placesStore = getModule(PlacesModule, this.$store)
+    uiStore = getModule(UiModule, this.$store)
+
+    toggleRecommend() {
+      this.uiStore.toggleRecommend()
+    }
 
     addPlace() {
       this.$buefy.dialog.prompt({

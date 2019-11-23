@@ -11,8 +11,8 @@
       <b-navbar-item tag="div" class="is-primary buttons">
         <b-button class="is-primary"
                   icon-pack="fas"
-                  icon-left="clock"
-                  @click="onToggleRecommendation"
+                  :icon-left="showsOnlyRecommend ? 'clock' : 'list'"
+                  @click="onToggleRecommend"
         />
         <b-button class="is-primary"
                   icon-pack="fas"
@@ -25,13 +25,15 @@
 </template>
 
 <script lang="ts">
-  import {Component, Emit, Vue} from 'vue-property-decorator'
+  import {Component, Emit, Prop, Vue} from 'vue-property-decorator'
 
   @Component({
     name: 'home-nav',
   })
   export default class HomeNav extends Vue {
-    @Emit() onToggleRecommendation() {}
+    @Prop() readonly showsOnlyRecommend!: boolean
+
+    @Emit() onToggleRecommend() {}
     @Emit() onAddPlace() {}
   }
 </script>

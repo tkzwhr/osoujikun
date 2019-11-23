@@ -1,8 +1,11 @@
 <template>
   <b-collapse
-      :open="false"
       class="card place"
-      :aria-id="place.id">
+      :aria-id="place.id"
+      :open="opened"
+      @open="onOpen(true)"
+      @close="onOpen(false)"
+  >
     <div
         slot="trigger"
         slot-scope="props"
@@ -73,8 +76,10 @@
     },
   })
   export default class PlaceCard extends Vue {
+    @Prop() readonly opened!: boolean
     @Prop() readonly place!: Place
 
+    @Emit() onOpen(flag: boolean): boolean { return flag }
     @Emit() onEditPlace(placeId: string): string { return placeId }
     @Emit() onDeletePlace(placeId: string): string { return placeId }
     @Emit() onAddTask(placeId: string): string { return placeId }
