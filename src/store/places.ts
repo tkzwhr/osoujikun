@@ -10,7 +10,8 @@ import {
   CreatePlanParams,
   UpdatePlaceParams,
   UpdateTaskParams,
-  UpdatePlanParams
+  UpdatePlanParams,
+  SortPlacesParams
 } from '@/interface'
 
 function _findPlace(places: Place[], id: string): Place | undefined {
@@ -182,6 +183,18 @@ export default class PlacesModule extends VuexModule {
     }
   }
 
+  @Mutation
+  SORT_PLACES(payload: SortPlacesParams) {
+    const newPlaces = this.places.slice()
+    this.places.splice(0, this.places.length)
+    payload.placeIds.forEach(v => {
+      const item = newPlaces.find(vv => vv.id === v)
+      if (item) {
+        this.places.push(item)
+      }
+    })
+  }
+
   @Action
   async createPlace(payload: CreatePlaceParams) {
     this.context.commit('CREATE_PLACE', payload)
@@ -230,5 +243,10 @@ export default class PlacesModule extends VuexModule {
   @Action
   async doCleaning(payload: string) {
     this.context.commit('DO_CLEANING', payload)
+  }
+
+  @Action
+  async sortPlaces(payload: SortPlacesParams) {
+    this.context.commit('SORT_PLACES', payload)
   }
 }

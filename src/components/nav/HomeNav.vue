@@ -19,6 +19,11 @@
                   icon-left="plus"
                   @click="onAddPlace"
         />
+        <b-button class="is-primary"
+                  icon-pack="fas"
+                  icon-left="arrows-alt-v"
+                  @click="onSort"
+        />
       </b-navbar-item>
     </template>
   </b-navbar>
@@ -35,6 +40,7 @@
 
     @Emit() onToggleRecommend() {}
     @Emit() onAddPlace() {}
+    @Emit() onSort() {}
   }
 </script>
 

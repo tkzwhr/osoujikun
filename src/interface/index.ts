@@ -1,3 +1,8 @@
+export interface Sortable {
+  id: string,
+  value: string,
+}
+
 export interface Place {
   id: string,
   name: string,
@@ -54,4 +59,8 @@ export interface UpdatePlanParams {
   name: string,
   interval: number,
   memo: string | null,
+}
+
+export interface SortPlacesParams {
+  placeIds: string[]
 }
